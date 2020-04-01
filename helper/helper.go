@@ -8,17 +8,23 @@ import (
 
 type (
 	PagingData struct {
-		Page        int    `json:"page" query:"page" form:"page" validate:"required"`
-		Rows        int    `json:"rows" query:"rows" form:"rows" validate:"required"`
-		FilterRules string `json:"filterRules" query:"filterRules" form:"filterRules"`
-		Sort        string `json:"sort" form:"sort"`
-		Order       string `json:"order"`
+		Page            int    `json:"page" query:"page" form:"page" validate:"required"`
+		Show            int    `json:"show" query:"show" form:"show" validate:"required"`
+		Search          string `json:"search" query:"search" form:"search"`
+		StartCreateDate string `json:"start_create_date" query:"start_create_date" form:"start_create_date"`
+		EndCreateDate   string `json:"end_create_date" query:"end_create_date" form:"end_create_date"`
 	}
 
-	FilterRule struct {
-		Field string `json:"field" form:"field"`
-		Op    string `json:"op" form:"op"`
-		Value string `json:"value" form:"value"`
+	Search struct {
+		Column string `json:"column" form:"column"`
+		Op     string `json:"op" form:"op"`
+		Value  string `json:"value" form:"value"`
+	}
+
+	PeriodFilter struct {
+		DateColumn string
+		StartDate  string
+		EndDate    string
 	}
 
 	Configuration struct {

@@ -11,6 +11,7 @@ import (
 
 	db "github.com/taufikardiyan28/rmet1/db"
 	h "github.com/taufikardiyan28/rmet1/helper"
+	router "github.com/taufikardiyan28/rmet1/services"
 )
 
 type CustomValidator struct {
@@ -65,7 +66,7 @@ func main() {
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 	}))
 
-	//router.RegisterRouters(e.Group("/api"))
+	router.RegisterV1(e.Group("/v1"))
 
 	e.Start(fmt.Sprintf(":%d", h.Config.Port))
 }
