@@ -12,6 +12,7 @@ import (
 	db "github.com/taufikardiyan28/rmet1/db"
 	h "github.com/taufikardiyan28/rmet1/helper"
 	router "github.com/taufikardiyan28/rmet1/services"
+	fileRouter "github.com/taufikardiyan28/rmet1/services/files"
 )
 
 type CustomValidator struct {
@@ -67,6 +68,7 @@ func main() {
 	}))
 
 	router.RegisterV1(e.Group("/v1"))
+	fileRouter.RegisterRouters(e.Group(""))
 
 	e.Start(fmt.Sprintf(":%d", h.Config.Port))
 }

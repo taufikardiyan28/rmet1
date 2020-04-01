@@ -35,8 +35,9 @@ type (
 			Password string `yaml:"password"`
 			DbName   string `yaml:"db_name"`
 		} `yaml:"database"`
-		Host string `yaml:"host"`
-		Port int    `yaml:"port"`
+		Host         string `yaml:"host"`
+		Port         int    `yaml:"port"`
+		GoogleApiKey string `yaml:"google_api_key"`
 	}
 )
 
