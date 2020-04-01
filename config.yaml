@@ -1,0 +1,8 @@
+database:
+  host: "localhost"
+  port: 3306
+  user: "root"
+  password: "dagangyuuk@my"
+  db_name: "operation"
+host: "localhost"
+port: 9055
