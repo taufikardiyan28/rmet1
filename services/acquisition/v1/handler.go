@@ -17,4 +17,5 @@ func (r *Service) RegisterRouters(g *echo.Group) {
 	g.POST("/detail", r.Detail)
 	g.POST("/find-place-id", r.GetGooglePlaceID)
 	g.POST("/get-latlng", r.GetLatLng)
+	g.PUT("/updateroom", r.UpdateRoom)
 }

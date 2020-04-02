@@ -50,7 +50,7 @@ func (s *Service) Summary(c echo.Context) error {
 
 func (s *Service) Detail(c echo.Context) error {
 	type param struct {
-		BuildId int `json:"build_id"`
+		BuildId int `json:"build_id" validate:"required"`
 	}
 
 	p := new(param)
@@ -177,4 +177,26 @@ func (s *Service) GetLatLng(c echo.Context) error {
 		return s.Send(c, 400, "Error", err.Error(), "")
 	}
 	return s.Send(c, 200, "Success", "Success", map[string]interface{}{"lat": lat, "lng": lng})
+}
+
+func (s *Service) UpdateRoom(c echo.Context) error {
+	type param struct {
+		BuildId int `json:"build_id" validate:"required"`
+		Data    []repo.RoomTypePostData
+	}
+
+	p := new(param)
+	if err := s.BindAndValidate(c, p); err != nil {
+		return s.Send(c, 400, "Error", err.Error(), "")
+	}
+
+	rep := new(repo.Repo)
+	userId := 46 // dummy user id
+	err := rep.UpdateRoom(p.BuildId, p.Data, userId)
+
+	if err != nil {
+		return s.Send(c, 400, "Error", err.Error(), "")
+	}
+
+	return s.Send(c, 200, "Success", "Success", "")
 }

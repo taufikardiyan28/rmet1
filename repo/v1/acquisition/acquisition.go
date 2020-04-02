@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	db "github.com/taufikardiyan28/rmet1/db"
 	h "github.com/taufikardiyan28/rmet1/helper"
@@ -33,6 +34,11 @@ type (
 	SummaryData struct {
 		AuditStatus string `db:"audit_status" json:"audit_status"`
 		Total       int    `db:"total" json:"total"`
+	}
+
+	RoomTypePostData struct {
+		RoomTypeID   int64  `json:"roomtype_id"`
+		RoomTypeName string `json:"roomtype_name"`
 	}
 
 	PlaceIDResponse struct {
@@ -220,4 +226,71 @@ func (r *Repo) GetLatLng(param string) (string, string, error) {
 		err = errors.New(res.ErrorMessage)
 	}
 	return lat, lng, err
+}
+
+func (r *Repo) UpdateRoom(buildId int, data []RoomTypePostData, userId int) error {
+	var roomTypeIds []int64
+	for _, room := range data {
+		if room.RoomTypeID != 0 {
+			roomTypeIds = append(roomTypeIds, room.RoomTypeID)
+		}
+	}
+
+	// hapus yang sudah ada sebelumnya
+	strSQL := `UPDATE room_type SET roomtype_del_status='1', roomtype_update_by=?, roomtype_update_date=NOW() WHERE roomtype_build_id=?`
+
+	err := r.BeginTx()
+	if err != nil {
+		return err
+	}
+
+	if len(roomTypeIds) > 0 {
+		_, err = r.Exec(strSQL, userId, buildId)
+
+		if err != nil {
+			r.RollbackTx()
+			r.ClearTx()
+			return err
+		}
+	}
+	// insert new room type
+	strSQL = `INSERT INTO room_type (roomtype_build_id, roomtype_name) VALUES `
+	valTags := []string{}
+	var insertArgs []interface{}
+	for _, room := range data {
+		if room.RoomTypeID == 0 {
+			valTags = append(valTags, "(?,?)")
+			insertArgs = append(insertArgs, buildId)
+			insertArgs = append(insertArgs, room.RoomTypeName)
+		}
+	}
+
+	if len(insertArgs) > 0 {
+		strSQL += strings.Join(valTags, ",")
+
+		_, err = r.Exec(strSQL, insertArgs...)
+
+		if err != nil {
+			r.RollbackTx()
+			r.ClearTx()
+			return err
+		}
+	}
+
+	// update roomtype
+	strSQL = `UPDATE room_type SET roomtype_del_status='0', roomtype_name=?, roomtype_update_by=?, roomtype_update_date=NOW() WHERE roomtype_build_id=? AND roomtype_id =?`
+	for _, room := range data {
+		if room.RoomTypeID != 0 {
+			_, err = r.Exec(strSQL, room.RoomTypeName, userId, buildId, room.RoomTypeID)
+			if err != nil {
+				r.RollbackTx()
+				r.ClearTx()
+				return err
+			}
+		}
+	}
+
+	err = r.CommitTx()
+	r.ClearTx()
+	return err
 }
